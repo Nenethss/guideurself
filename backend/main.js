@@ -5,7 +5,6 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import fs from 'fs';
 
 // Setup __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -221,6 +220,6 @@ app.put('/backend/pins/:id', markerUpload.single('image'), async (req, res) => {
 });
 
 // Start the server on port 3002
-app.listen(3002, () => {
+app.listen(process.env.PORT || 3002, () => {
   console.log('Server running');
 });
