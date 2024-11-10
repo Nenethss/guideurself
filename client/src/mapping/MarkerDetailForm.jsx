@@ -26,7 +26,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
 
   const fetchMarkers = async () => {
     try {
-      const response = await fetch('http://localhost:3002/backend/pins');
+      const response = await fetch('https://guideurself.onrender.com/backend/pins');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -40,7 +40,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
 
   const deleteMarker = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3002/backend/pins/${id}`, {
+      const response = await fetch(`https://guideurself.onrender.com/backend/pins/${id}`, {
         method: 'DELETE',
       });
 
@@ -67,7 +67,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
     }
   
     try {
-      const response = await fetch(`http://localhost:3002/backend/pins/${marker._id}`, {
+      const response = await fetch(`https://guideurself.onrender.com/backend/pins/${marker._id}`, {
         method: 'PUT',
         body: formData,
       });
@@ -122,29 +122,30 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
         </div>      
         <div className="input-area">
           <div className="upload-area">
-            {isEditing ? (
-              <>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  id="marker-file-upload" 
-                  style={{ display: 'none' }} 
-                  onChange={handleMarkerFileChange} 
-                />
-                <label htmlFor="marker-file-upload">Upload a file or drag and drop</label>
-                {newImagePreview && (
-                  <PanoramicViewer imageUrl={newImagePreview} />
-                )}
-              </>
-            ) : (
-              <>
-                {marker.image ? (
-                  <PanoramicViewer imageUrl={`http://localhost:3002/backend/images/${marker.image}`} />
-                ) : (
-                  <p>No image available</p>
-                )}
-              </>
+          {isEditing ? (
+          <>
+            <input 
+              type="file" 
+              accept="image/*" 
+              id="marker-file-upload" 
+              style={{ display: 'none' }} 
+              onChange={handleMarkerFileChange} 
+            />
+            <label htmlFor="marker-file-upload">Upload a file or drag and drop</label>
+            {newImagePreview && (
+              <PanoramicViewer imageUrl={newImagePreview} />
             )}
+          </>
+        ) : (
+          <>
+            {marker.image ? (
+              <PanoramicViewer imageUrl={marker.image} /> // Use the full Cloudinary URL here
+            ) : (
+              <p>No image available</p>
+            )}
+          </>
+        )}
+
           </div>
         </div>
 

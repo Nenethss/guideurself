@@ -3,12 +3,19 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import multer from 'multer';
 import path from 'path';
+import cloudinary from 'cloudinary';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 // Setup __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+cloudinary.config({
+  cloud_name: 'dtv9zeo30', // Replace with your Cloudinary cloud name
+  api_key: '449921846459426', // Replace with your Cloudinary API key
+  api_secret: '-HaGM1iVapQyQOXk16OBmVN4ybQ', // Replace with your Cloudinary API secret
+});
 
 // Initialize Express app
 const app = express();
@@ -39,10 +46,6 @@ const mapSchema = new mongoose.Schema({
 
 const Marker = mongoose.model('Marker', markerSchema);
 const Map = mongoose.model('Map', mapSchema);
-
-// Serve static files for images and maps
-app.use('/backend/images', express.static(join(__dirname, 'images')));
-app.use('/backend/maps', express.static(join(__dirname, 'maps')));
 
 // Configure multer for marker uploads
 const markerStorage = multer.diskStorage({
@@ -106,45 +109,59 @@ app.get('/backend/pins', async (req, res) => {
 });
 
 // API route to save a new marker in the database
+// API route to save a new marker in the database
 app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
   try {
     console.log('Request body:', req.body); // Log the request body
     console.log('File:', req.file); // Log the uploaded file
 
     const { lat, lng, title, description } = req.body;
-    const image = req.file ? req.file.filename : null;
-
-    // Validate fields
-    if (!lat || !lng || !title || !description || !image) {
+    
+    if (!lat || !lng || !title || !description) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // Upload the image to Cloudinary
+    const cloudinaryResponse = await cloudinary.v2.uploader.upload(req.file.path);
+
+    // Save the image URL returned from Cloudinary
+    const imageUrl = cloudinaryResponse.secure_url;
+
     // Save marker to database
-    const newMarker = new Marker({ lat, lng, title, description, image });
+    const newMarker = new Marker({ lat, lng, title, description, image: imageUrl });
     await newMarker.save();
 
     // Respond with the saved marker data
-    res.status(201).json({ lat, lng, title, description, image });
+    res.status(201).json({ lat, lng, title, description, image: imageUrl });
   } catch (error) {
     console.error('Error saving marker:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// API route to upload a new map image
 app.post('/backend/maps/upload', mapUpload.single('mapImage'), async (req, res) => {
-  const mapImage = req.file ? req.file.filename : null;
-
-  if (!mapImage) {
+  if (!req.file) {
     return res.status(400).send('Map image is required');
   }
 
   try {
-    const map = new Map({ filename: mapImage });
-    await map.save();
-    res.json({ message: 'Map image uploaded and saved successfully', filename: mapImage });
+    // Upload the image to Cloudinary
+    const cloudinaryResponse = await cloudinary.v2.uploader.upload(req.file.path);
+
+    // Get the Cloudinary URL for the map image
+    const mapImageUrl = cloudinaryResponse.secure_url;
+
+    // Save the Cloudinary URL to MongoDB (Map collection)
+    const newMap = new Map({ filename: mapImageUrl });
+    await newMap.save();  // Save the map in the database
+
+    // Return the Cloudinary URL and a success message
+    res.json({
+      message: 'Map image uploaded and saved successfully',
+      url: mapImageUrl,  // Return the Cloudinary URL
+    });
   } catch (err) {
-    console.error('Error saving map image to database:', err);
+    console.error('Error uploading map image to Cloudinary:', err);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -194,9 +211,16 @@ app.put('/backend/pins/:id', markerUpload.single('image'), async (req, res) => {
     lng,
   };
 
-  // If a new image was uploaded, add the filename to the updated data
+  // If a new image was uploaded, upload it to Cloudinary
   if (req.file) {
-    updatedData.image = req.file.filename; // Save the filename of the uploaded image
+    try {
+      // Upload image to Cloudinary
+      const cloudinaryResponse = await cloudinary.v2.uploader.upload(req.file.path);
+      updatedData.image = cloudinaryResponse.secure_url; // Save the full Cloudinary URL
+    } catch (error) {
+      console.error('Error uploading image to Cloudinary:', error);
+      return res.status(500).json({ message: 'Error uploading image' });
+    }
   }
 
   try {
@@ -218,6 +242,7 @@ app.put('/backend/pins/:id', markerUpload.single('image'), async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 // Start the server on port 3002
 app.listen(process.env.PORT || 3002, () => {

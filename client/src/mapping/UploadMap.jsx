@@ -6,7 +6,7 @@ export const UploadMap = ({ setUploadedMap }) => {
       formData.append('mapImage', file);
 
       try {
-        const response = await fetch('http://localhost:3002/backend/maps/upload', {
+        const response = await fetch('https://guideurself.onrender.com/backend/maps/upload', {
           method: 'POST',
           body: formData,
         });
@@ -16,7 +16,9 @@ export const UploadMap = ({ setUploadedMap }) => {
         }
 
         const data = await response.json();
-        setUploadedMap(`http://localhost:3002/backend/maps/${data.filename}`);
+
+        // Set the Cloudinary URL returned from the backend
+        setUploadedMap(data.url);
       } catch (error) {
         console.error('Error uploading map image:', error);
       }
@@ -37,4 +39,4 @@ export const UploadMap = ({ setUploadedMap }) => {
   );
 };
 
-export default UploadMap;   
+export default UploadMap;

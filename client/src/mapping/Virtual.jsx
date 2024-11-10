@@ -17,7 +17,7 @@ function Virtual() {
   useEffect(() => {
     const fetchMarkers = async () => {
       try {
-        const response = await fetch('http://localhost:3002/backend/pins');
+        const response = await fetch('https://guideurself.onrender.com/backend/pins');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -33,24 +33,28 @@ function Virtual() {
   useEffect(() => {
     const fetchUploadedMap = async () => {
       try {
-        const response = await fetch('http://localhost:3002/backend/maps');
+        const response = await fetch('https://guideurself.onrender.com/backend/maps');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        console.log('Fetched Map Data:', data); // Debugging line
         if (data.length > 0) {
-          setUploadedMap(`http://localhost:3002/backend/maps/${data[0].filename}`); // Use backticks for string interpolation
+          setUploadedMap(data[0].filename); // Store the Cloudinary URL correctly
         }
       } catch (error) {
         console.error('Error fetching uploaded map:', error);
       }
     };
+    
+    
     fetchUploadedMap();
   }, []);
-
+  
+  
   const fetchMarkers = async () => {
     try {
-      const response = await fetch('http://localhost:3002/backend/pins');
+      const response = await fetch('https://guideurself.onrender.com/backend/pins');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -64,7 +68,7 @@ function Virtual() {
 
   const deleteMarker = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3002/backend/pins/${id}`, {
+      const response = await fetch(`https://guideurself.onrender.com/backend/pins/${id}`, {
         method: 'DELETE',
       });
   
