@@ -21,7 +21,7 @@ export const MarkerForm = ({ newMarker, setNewMarker, setMarkers, setFormVisible
     formData.append('image', image);
 
     try {
-      const response = await fetch('http://localhost:3002/backend/pins', {
+      const response = await fetch('https://guideurself.onrender.com/backend/pins', {
         method: 'POST',
         body: formData,
       });

@@ -26,7 +26,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
 
   const fetchMarkers = async () => {
     try {
-      const response = await fetch('http://localhost:3002/backend/pins');
+      const response = await fetch('https://guideurself.onrender.com/backend/pins');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -40,7 +40,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
 
   const deleteMarker = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3002/backend/pins/${id}`, {
+      const response = await fetch(`https://guideurself.onrender.com/backend/pins/${id}`, {
         method: 'DELETE',
       });
 
@@ -67,7 +67,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
     }
   
     try {
-      const response = await fetch(`http://localhost:3002/backend/pins/${marker._id}`, {
+      const response = await fetch(`https://guideurself.onrender.com/backend/pins/${marker._id}`, {
         method: 'PUT',
         body: formData,
       });
