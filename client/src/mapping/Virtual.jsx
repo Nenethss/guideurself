@@ -17,7 +17,7 @@ function Virtual() {
   useEffect(() => {
     const fetchMarkers = async () => {
       try {
-        const response = await fetch('https://guideurself.onrender.com/backend/pins');
+        const response = await fetch('http://localhost:3002/backend/pins');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -33,7 +33,7 @@ function Virtual() {
   useEffect(() => {
     const fetchUploadedMap = async () => {
       try {
-        const response = await fetch('https://guideurself.onrender.com/backend/maps');
+        const response = await fetch('http://localhost:3002/backend/maps');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -54,7 +54,7 @@ function Virtual() {
   
   const fetchMarkers = async () => {
     try {
-      const response = await fetch('https://guideurself.onrender.com/backend/pins');
+      const response = await fetch('http://localhost:3002/backend/pins');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -68,7 +68,7 @@ function Virtual() {
 
   const deleteMarker = async (id) => {
     try {
-      const response = await fetch(`https://guideurself.onrender.com/backend/pins/${id}`, {
+      const response = await fetch(`http://localhost:3002/backend/pins/${id}`, {
         method: 'DELETE',
       });
   

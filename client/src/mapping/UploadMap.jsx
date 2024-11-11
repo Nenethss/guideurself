@@ -6,7 +6,7 @@ export const UploadMap = ({ setUploadedMap }) => {
       formData.append('mapImage', file);
 
       try {
-        const response = await fetch('https://guideurself.onrender.com/backend/maps/upload', {
+        const response = await fetch('http://localhost:3002/backend/maps/upload', {
           method: 'POST',
           body: formData,
         });

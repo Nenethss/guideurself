@@ -144,6 +144,8 @@ app.post('/backend/maps/upload', mapUpload.single('mapImage'), async (req, res) 
     return res.status(400).send('Map image is required');
   }
 
+  console.log('File path:', req.file.path);
+
   try {
     // Upload the image to Cloudinary
     const cloudinaryResponse = await cloudinary.v2.uploader.upload(req.file.path);
