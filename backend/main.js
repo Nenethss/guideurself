@@ -88,7 +88,7 @@ app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
     }
 
     // Upload the image to Cloudinary
-    const cloudinaryResponse = await cloudinary.v2.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+    const cloudinaryResponse = await cloudinary.v2.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
       if (error) {
         console.error('Error uploading image to Cloudinary:', error);
         return res.status(500).send('Internal Server Error');
@@ -98,9 +98,10 @@ app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
 
       // Save marker to database
       const newMarker = new Marker({ lat, lng, title, description, image: imageUrl });
-      newMarker.save();
+      await newMarker.save();  // Ensure we wait for the marker to be saved
 
-      res.status(201).json({ lat, lng, title, description, image: imageUrl });
+      // Return the entire newMarker object, including _id
+      res.status(201).json(newMarker);
     });
 
     const bufferStream = new Readable();
@@ -113,6 +114,7 @@ app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // API route to upload map images
 app.post('/backend/maps/upload', markerUpload.single('mapImage'), async (req, res) => {

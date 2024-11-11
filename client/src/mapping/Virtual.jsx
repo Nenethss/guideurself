@@ -22,6 +22,7 @@ function Virtual() {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        console.log('Fetched Markers:', data); // Check the structure of the fetched markers
         setMarkers(data);
       } catch (error) {
         console.error('Error fetching markers:', error);
@@ -29,6 +30,7 @@ function Virtual() {
     };
     fetchMarkers();
   }, []);
+  
 
   useEffect(() => {
     const fetchUploadedMap = async () => {
@@ -68,7 +70,7 @@ function Virtual() {
 
   const deleteMarker = async (id) => {
     try {
-      const response = await fetch(`https://guideurself.onrender.com/pins/${id}`, {
+      const response = await fetch(`https://guideurself.onrender.com/backend/pins/${id}`, {
         method: 'DELETE',
       });
   
@@ -90,12 +92,14 @@ function Virtual() {
   };
   
   const onMarkerClick = (marker) => {
+    console.log('Clicked Marker:', marker);
     setSelectedMarker(marker); // This should set the selected marker correctly
     setDetailVisible(true); // Show the detail form
   };
   
 
   return (
+    
     <div className="map-upload-container">
       <UploadMap setUploadedMap={setUploadedMap} />
       {uploadedMap && (

@@ -4,39 +4,44 @@ import PanoramicViewer from './PanoramicViewer';
 export const MarkerForm = ({ newMarker, setNewMarker, setMarkers, setFormVisible }) => {
   const handleFormSubmit = async () => {
     const { lat, lng, title, description, image } = newMarker;
-
-    // Log newMarker to check its values
+  
     console.log('New Marker:', newMarker);
-
+  
     if (!title || !description || !image) {
       alert("Please fill out all fields and select an image");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('lat', lat);
     formData.append('lng', lng);
     formData.append('title', title);
     formData.append('description', description);
     formData.append('image', image);
-
+  
     try {
       const response = await fetch('https://guideurself.onrender.com/backend/pins', {
         method: 'POST',
         body: formData,
       });
-
+  
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
+  
       const data = await response.json();
-      setMarkers((prev) => [...prev, { ...data, lat, lng, title, description }]);
+  
+      // Ensure the returned marker includes the _id
+      setMarkers((prev) => [
+        ...prev, 
+        { ...data, lat, lng, title, description } // Assuming the `data` includes an _id
+      ]);
       setFormVisible(false);
     } catch (error) {
       console.error('Error saving marker:', error);
     }
   };
+  
 
   const handleMarkerFileChange = (event) => {
     const file = event.target.files[0];

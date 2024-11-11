@@ -43,27 +43,30 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
       const response = await fetch(`https://guideurself.onrender.com/backend/pins/${id}`, {
         method: 'DELETE',
       });
-
+  
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
-      // Fetch the updated list of markers from the server
-      const updatedMarkers = await fetchMarkers();
-      setMarkers(updatedMarkers);
+  
+      // Directly update state to remove the deleted marker
+      setMarkers((prevMarkers) => prevMarkers.filter((marker) => marker._id !== id));
       setFormVisible(false);
     } catch (error) {
       console.error('Error deleting marker:', error);
     }
   };
+  
 
   const updateMarker = async () => {
+    console.log("Updating marker with id:", marker._id); // Ensure marker._id is correct
+  
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    
-    if (newImageFile) { // This is the new image file chosen by the user
-      formData.append('image', newImageFile);
+    formData.append('lat', marker.lat);  // Ensure lat is passed
+    formData.append('lng', marker.lng);  // Ensure lng is passed
+    if (newImageFile) {
+      formData.append('image', newImageFile); // Include the new image if provided
     }
   
     try {
@@ -75,17 +78,19 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+  
       const updatedMarkers = await fetchMarkers();
-      setMarkers(updatedMarkers);
+      setMarkers(updatedMarkers);  // Refresh the markers after update
       setFormVisible(false);
-      setIsEditing(false); // Exit edit mode after successful update
-      setNewImagePreview(null); // Reset image preview
-      setNewImageFile(null); // Reset image file
+      setIsEditing(false);
+      setNewImagePreview(null);
+      setNewImageFile(null);
     } catch (error) {
       console.error('Error updating marker:', error);
     }
   };
-
+  
+  
   const toggleEdit = () => {
     setIsEditing((prev) => !prev); // Toggle edit mode
   };
