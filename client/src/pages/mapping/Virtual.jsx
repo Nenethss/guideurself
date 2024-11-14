@@ -3,16 +3,16 @@ import "leaflet/dist/leaflet.css";
 import './style.css';
 import Maps from './Maps';
 import MarkerForm from './MarkerForm';
-import MarkerDetailForm from './MarkerDetailForm'; // Import MarkerDetailForm
+import MarkerDetailForm from './MarkerDetailForm'; 
 import UploadMap from './UploadMap';
 
 function Virtual() {  
   const [markers, setMarkers] = useState([]);
   const [formVisible, setFormVisible] = useState(false);
-  const [detailVisible, setDetailVisible] = useState(false); // State for marker detail visibility
+  const [detailVisible, setDetailVisible] = useState(false); 
   const [newMarker, setNewMarker] = useState({ lat: null, lng: null, title: '', description: '', image: null, imagePreview: null });
-  const [selectedMarker, setSelectedMarker] = useState(null); // State for selected marker
-  const [uploadedMap, setUploadedMap] = useState(null); // State for the uploaded map
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [uploadedMap, setUploadedMap] = useState(null); 
 
   useEffect(() => {
     const fetchMarkers = async () => {
@@ -22,7 +22,7 @@ function Virtual() {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log('Fetched Markers:', data); // Check the structure of the fetched markers
+        console.log('Fetched Markers:', data); 
         setMarkers(data);
       } catch (error) {
         console.error('Error fetching markers:', error);
@@ -40,9 +40,9 @@ function Virtual() {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log('Fetched Map Data:', data); // Debugging line
+        console.log('Fetched Map Data:', data);
         if (data.length > 0) {
-          setUploadedMap(data[0].filename); // Store the Cloudinary URL correctly
+          setUploadedMap(data[0].filename); 
         }
       } catch (error) {
         console.error('Error fetching uploaded map:', error);
@@ -61,10 +61,10 @@ function Virtual() {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      return data; // Return the fetched data
+      return data; 
     } catch (error) {
       console.error('Error fetching markers:', error);
-      return []; // Return an empty array on error
+      return []; 
     }
   };
 
@@ -78,13 +78,10 @@ function Virtual() {
         throw new Error('Network response was not ok');
       }
   
-      // Fetch the updated list of markers from the server
       const updatedMarkers = await fetchMarkers();
   
-      // Update state with the new list of markers
       setMarkers(updatedMarkers);
   
-      // Optionally, close the detail view
       setDetailVisible(false);
     } catch (error) {
       console.error('Error deleting marker:', error);
@@ -93,8 +90,8 @@ function Virtual() {
   
   const onMarkerClick = (marker) => {
     console.log('Clicked Marker:', marker);
-    setSelectedMarker(marker); // This should set the selected marker correctly
-    setDetailVisible(true); // Show the detail form
+    setSelectedMarker(marker); 
+    setDetailVisible(true);
   };
   
 
@@ -120,11 +117,11 @@ function Virtual() {
           setFormVisible={setFormVisible} 
         />
       )}
-      {detailVisible && selectedMarker && ( // Show MarkerDetailForm if detail is visible and a marker is selected
+      {detailVisible && selectedMarker && (
         <MarkerDetailForm 
           marker={selectedMarker} 
-          setFormVisible={setDetailVisible} // Use the same function to close the detail form
-          deleteMarker={deleteMarker} // Pass the delete function
+          setFormVisible={setDetailVisible}
+          deleteMarker={deleteMarker}
           setMarkers={setMarkers}
         />
       )}

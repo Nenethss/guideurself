@@ -7,50 +7,47 @@ import cloudinary from 'cloudinary';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { Readable } from 'stream';
+import dotenv from 'dotenv';
 
-// Setup __dirname
+dotenv.config();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 cloudinary.config({
-  cloud_name: 'dtv9zeo30', // Replace with your Cloudinary cloud name
-  api_key: '449921846459426', // Replace with your Cloudinary API key
-  api_secret: '-HaGM1iVapQyQOXk16OBmVN4ybQ', // Replace with your Cloudinary API secret
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
 });
 
-// Initialize Express app
 const app = express();
 app.use(cors());
-app.use(express.json()); // To parse incoming JSON requests
+app.use(express.json()); 
 
-// MongoDB connection
-const db_password = 'admin123'; // Replace with your actual DB password
-const mongoURI = `mongodb+srv://admin:${db_password}@cluster0.qd6mw.mongodb.net/mapdb?retryWrites=true&w=majority&appName=Cluster0`;
+const mongoURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`;
 
 mongoose.connect(mongoURI)
     .then(() => console.log("Connected to MongoDB"))
     .catch(err => console.error("Error connecting to MongoDB:", err));
 
-// MongoDB Schemas
 const markerSchema = new mongoose.Schema({
   lat: Number,
   lng: Number,
   title: String,
   description: String,
-  image: String, // Store marker image filename
-  mapId: { type: mongoose.Schema.Types.ObjectId, ref: 'Map' }, // Reference the map
+  image: String, 
+  mapId: { type: mongoose.Schema.Types.ObjectId, ref: 'Map' }, 
 });
 
 const mapSchema = new mongoose.Schema({
-  filename: String, // Store map image filename
+  filename: String, 
 });
 
 const Marker = mongoose.model('Marker', markerSchema);
 const Map = mongoose.model('Map', mapSchema);
 
-// Configure multer for marker uploads without storing locally
 const markerUpload = multer({
-  storage: multer.memoryStorage(), // Store files in memory instead of local disk
+  storage: multer.memoryStorage(), 
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -61,10 +58,9 @@ const markerUpload = multer({
       cb('Error: Only images are allowed');
     }
   },
-  limits: { fileSize: 50 * 1024 * 1024 } // Limit file size to 50MB
+  limits: { fileSize: 50 * 1024 * 1024 }
 });
 
-// API route to fetch all markers from the database
 app.get('/backend/pins', async (req, res) => {
   try {
     const markers = await Marker.find();
@@ -75,11 +71,10 @@ app.get('/backend/pins', async (req, res) => {
   }
 });
 
-// API route to save a new marker in the database
 app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
   try {
-    console.log('Request body:', req.body); // Log the request body
-    console.log('File:', req.file); // Log the uploaded file
+    console.log('Request body:', req.body); 
+    console.log('File:', req.file); 
 
     const { lat, lng, title, description } = req.body;
     
@@ -87,7 +82,6 @@ app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Upload the image to Cloudinary
     const cloudinaryResponse = await cloudinary.v2.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
       if (error) {
         console.error('Error uploading image to Cloudinary:', error);
@@ -96,17 +90,15 @@ app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
 
       const imageUrl = result.secure_url;
 
-      // Save marker to database
       const newMarker = new Marker({ lat, lng, title, description, image: imageUrl });
-      await newMarker.save();  // Ensure we wait for the marker to be saved
+      await newMarker.save(); 
 
-      // Return the entire newMarker object, including _id
       res.status(201).json(newMarker);
     });
 
     const bufferStream = new Readable();
     bufferStream.push(req.file.buffer);
-    bufferStream.push(null); // End the stream
+    bufferStream.push(null); 
     bufferStream.pipe(cloudinaryResponse);
 
   } catch (error) {
@@ -115,20 +107,17 @@ app.post('/backend/pins', markerUpload.single('image'), async (req, res) => {
   }
 });
 
-
-// API route to upload map images
 app.post('/backend/maps/upload', markerUpload.single('mapImage'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('Map image is required');
   }
 
   try {
-    // Convert buffer to stream
+   
     const bufferStream = new Readable();
     bufferStream.push(req.file.buffer);
-    bufferStream.push(null); // Signal end of stream
+    bufferStream.push(null); 
 
-    // Upload the buffer stream to Cloudinary
     const cloudinaryResponse = await cloudinary.v2.uploader.upload_stream(
       { resource_type: 'image' },
       (error, result) => {
@@ -139,13 +128,12 @@ app.post('/backend/maps/upload', markerUpload.single('mapImage'), async (req, re
 
         const mapImageUrl = result.secure_url;
 
-        // Save the Cloudinary URL to MongoDB (Map collection)
         const newMap = new Map({ filename: mapImageUrl });
         newMap.save()
           .then(() => {
             res.json({
               message: 'Map image uploaded and saved successfully',
-              url: mapImageUrl,  // Return the Cloudinary URL
+              url: mapImageUrl,  
             });
           })
           .catch((err) => {
@@ -155,7 +143,6 @@ app.post('/backend/maps/upload', markerUpload.single('mapImage'), async (req, re
       }
     );
 
-    // Pipe the buffer stream to the Cloudinary upload stream
     bufferStream.pipe(cloudinaryResponse);
 
   } catch (err) {
@@ -164,7 +151,6 @@ app.post('/backend/maps/upload', markerUpload.single('mapImage'), async (req, re
   }
 });
 
-// API route to fetch the current map images
 app.get('/backend/maps', async (req, res) => {
   try {
     const maps = await Map.find();
@@ -175,7 +161,6 @@ app.get('/backend/maps', async (req, res) => {
   }
 });
 
-// API route to delete a marker by ID
 app.delete('/backend/pins/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -193,7 +178,6 @@ app.delete('/backend/pins/:id', async (req, res) => {
   }
 });
 
-// API route to update an existing marker
 app.put('/backend/pins/:id', markerUpload.single('image'), async (req, res) => {
   const { id } = req.params;
   const { title, description, lat, lng } = req.body;
@@ -215,7 +199,6 @@ app.put('/backend/pins/:id', markerUpload.single('image'), async (req, res) => {
 
         updatedData.image = result.secure_url;
 
-        // Find the marker by ID and update it
         Marker.findByIdAndUpdate(id, updatedData, { new: true })
           .then(updatedMarker => {
             res.json(updatedMarker);
@@ -236,7 +219,6 @@ app.put('/backend/pins/:id', markerUpload.single('image'), async (req, res) => {
       return res.status(500).json({ message: 'Error uploading image' });
     }
   } else {
-    // If no new image was uploaded, just update text fields
     try {
       const updatedMarker = await Marker.findByIdAndUpdate(id, updatedData, { new: true });
       res.json(updatedMarker);
@@ -247,7 +229,6 @@ app.put('/backend/pins/:id', markerUpload.single('image'), async (req, res) => {
   }
 });
 
-// Start the server on port 3002
 app.listen(process.env.PORT || 3002, () => {
   console.log('Server running');
 });

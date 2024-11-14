@@ -17,7 +17,6 @@ export const UploadMap = ({ setUploadedMap }) => {
 
         const data = await response.json();
 
-        // Set the Cloudinary URL returned from the backend
         setUploadedMap(data.url);
       } catch (error) {
         console.error('Error uploading map image:', error);

@@ -2,8 +2,7 @@ import { MapContainer, Marker, Popup, useMapEvents, ImageOverlay } from 'react-l
 import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import './style.css';
-import MarkerDetailForm from './MarkerDetailForm';
-import markerIconUrl from './icon/pin.png';
+import markerIconUrl from '../../assets/pin.png';
 
 const Maps = ({ markers, uploadedMap, setFormVisible, setNewMarker, onMarkerClick }) => {
   const bounds = [[14.480740, 121.184750], [14.488870, 121.192500]];
@@ -12,7 +11,6 @@ const Maps = ({ markers, uploadedMap, setFormVisible, setNewMarker, onMarkerClic
     console.log('Uploaded Map URL:', uploadedMap);
   }, [uploadedMap]);
   
-  // This component will handle the addition of markers and their click events
   function AddMarkerToClick() {
     useMapEvents({
       click(e) {
@@ -30,14 +28,13 @@ const Maps = ({ markers, uploadedMap, setFormVisible, setNewMarker, onMarkerClic
 
     return markers.map((marker) => (
       <Marker 
-        key={marker.id} // Use the marker ID as the key
+        key={marker.id} 
         position={[marker.lat, marker.lng]} 
         icon={markerIcon}
         eventHandlers={{ 
-          click: () => onMarkerClick(marker) // Call the onMarkerClick with the marker data
+          click: () => onMarkerClick(marker)
         }}
       >
-        <Popup>{marker.title}</Popup> {/* Optional: Display title in the popup */}
       </Marker>
     ));
   }

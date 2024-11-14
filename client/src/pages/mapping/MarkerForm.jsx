@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import PanoramicViewer from './PanoramicViewer';
 
 export const MarkerForm = ({ newMarker, setNewMarker, setMarkers, setFormVisible }) => {
@@ -31,10 +30,9 @@ export const MarkerForm = ({ newMarker, setNewMarker, setMarkers, setFormVisible
   
       const data = await response.json();
   
-      // Ensure the returned marker includes the _id
       setMarkers((prev) => [
         ...prev, 
-        { ...data, lat, lng, title, description } // Assuming the `data` includes an _id
+        { ...data, lat, lng, title, description } 
       ]);
       setFormVisible(false);
     } catch (error) {
@@ -48,11 +46,10 @@ export const MarkerForm = ({ newMarker, setNewMarker, setMarkers, setFormVisible
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        // Set the marker with image preview here
         setNewMarker({
           ...newMarker,
-          imagePreview: reader.result, // Set image preview correctly
-          image: file // Keep original image file reference
+          imagePreview: reader.result, 
+          image: file 
         });
       };
       reader.readAsDataURL(file);

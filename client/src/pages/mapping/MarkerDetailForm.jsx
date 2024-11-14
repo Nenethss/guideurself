@@ -4,9 +4,9 @@ import PanoramicViewer from './PanoramicViewer';
 const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
   const [title, setTitle] = useState(marker.title);
   const [description, setDescription] = useState(marker.description);
-  const [isEditing, setIsEditing] = useState(false); // State to track edit mode
-  const [newImageFile, setNewImageFile] = useState(null); // State for new image file
-  const [newImagePreview, setNewImagePreview] = useState(null); // State for new image preview
+  const [isEditing, setIsEditing] = useState(false); 
+  const [newImageFile, setNewImageFile] = useState(null); 
+  const [newImagePreview, setNewImagePreview] = useState(null); 
 
   const handleClick = (event) => {
     event.stopPropagation();
@@ -17,8 +17,8 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewImagePreview(reader.result); // Set image preview
-        setNewImageFile(file); // Keep original image file reference
+        setNewImagePreview(reader.result); 
+        setNewImageFile(file);
       };
       reader.readAsDataURL(file);
     }
@@ -31,10 +31,10 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      return data; // Return the fetched data
+      return data; 
     } catch (error) {
       console.error('Error fetching markers:', error);
-      return []; // Return an empty array on error
+      return [];
     }
   };
 
@@ -48,7 +48,6 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
         throw new Error('Network response was not ok');
       }
   
-      // Directly update state to remove the deleted marker
       setMarkers((prevMarkers) => prevMarkers.filter((marker) => marker._id !== id));
       setFormVisible(false);
     } catch (error) {
@@ -58,15 +57,15 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
   
 
   const updateMarker = async () => {
-    console.log("Updating marker with id:", marker._id); // Ensure marker._id is correct
+    console.log("Updating marker with id:", marker._id); 
   
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('lat', marker.lat);  // Ensure lat is passed
-    formData.append('lng', marker.lng);  // Ensure lng is passed
+    formData.append('lat', marker.lat);  
+    formData.append('lng', marker.lng);  
     if (newImageFile) {
-      formData.append('image', newImageFile); // Include the new image if provided
+      formData.append('image', newImageFile); 
     }
   
     try {
@@ -80,7 +79,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
       }
   
       const updatedMarkers = await fetchMarkers();
-      setMarkers(updatedMarkers);  // Refresh the markers after update
+      setMarkers(updatedMarkers);  
       setFormVisible(false);
       setIsEditing(false);
       setNewImagePreview(null);
@@ -92,15 +91,15 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
   
   
   const toggleEdit = () => {
-    setIsEditing((prev) => !prev); // Toggle edit mode
+    setIsEditing((prev) => !prev); 
   };
 
   const cancelEdit = () => {
-    setTitle(marker.title); // Reset title to original value
-    setDescription(marker.description); // Reset description to original value
-    setNewImagePreview(null); // Reset image preview
-    setNewImageFile(null); // Reset image file
-    setIsEditing(false); // Exit edit mode
+    setTitle(marker.title); 
+    setDescription(marker.description); 
+    setNewImagePreview(null); 
+    setNewImageFile(null); 
+    setIsEditing(false); 
   };
 
   return (
@@ -111,8 +110,8 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
           type="text" 
           placeholder="Location Name" 
           value={title} 
-          onChange={(e) => setTitle(e.target.value)} // Update local state
-          readOnly={!isEditing} // Toggle read-only based on edit mode
+          onChange={(e) => setTitle(e.target.value)} 
+          readOnly={!isEditing}
         />
         </div>
         <div className='input-area'>
@@ -120,8 +119,8 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
         <textarea 
           placeholder="Description" 
           value={description} 
-          onChange={(e) => setDescription(e.target.value)} // Update local state
-          readOnly={!isEditing} // Toggle read-only based on edit mode
+          onChange={(e) => setDescription(e.target.value)} 
+          readOnly={!isEditing} 
           style={{ resize: 'none' }} 
         />
         </div>      
@@ -144,7 +143,7 @@ const MarkerDetailForm = ({ marker, setFormVisible, setMarkers }) => {
         ) : (
           <>
             {marker.image ? (
-              <PanoramicViewer imageUrl={marker.image} /> // Use the full Cloudinary URL here
+              <PanoramicViewer imageUrl={marker.image} />
             ) : (
               <p>No image available</p>
             )}

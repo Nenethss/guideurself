@@ -7,7 +7,7 @@ import RegisterLayout from "./pages/layouts/RegisterLayout";
 import DashBoard from "./pages/dashboard/DashBoard";
 import SignInForm from "./pages/auth/SignInForm";
 import Documents from "./pages/docpage/Documents";
-import CampusRoute from "./mapping/CampusRoute";
+import CampusRoute from "./pages/mapping/CampusRoute";
 import ResendPasswordForm from "./pages/auth/ResendPasswordForm";
 
 const router = createBrowserRouter([

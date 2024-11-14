@@ -1,5 +1,5 @@
 import React from 'react';
-import PanelLayout from "../pages/layouts/PanelLayout";
+import PanelLayout from "../layouts/PanelLayout";
 import Virtual from './Virtual';
 import { Outlet } from 'react-router-dom'; 
 

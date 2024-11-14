@@ -1,13 +1,11 @@
-// PanoramicViewer.jsx
 import React, { useEffect, useRef } from 'react';
-import Marzipano from 'marzipano'; // Make sure to install marzipano
+import Marzipano from 'marzipano'; 
 
 const PanoramicViewer = ({ imageUrl }) => {
   const viewerRef = useRef(null);
   
   useEffect(() => {
     if (viewerRef.current) {
-      // Initialize the viewer
       const panoElement = viewerRef.current;
       const viewer = new Marzipano.Viewer(panoElement);
       const source = Marzipano.ImageUrlSource.fromString(imageUrl);
