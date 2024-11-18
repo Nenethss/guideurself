@@ -58,7 +58,7 @@ const markerUpload = multer({
       cb('Error: Only images are allowed');
     }
   },
-  limits: { fileSize: 50 * 1024 * 1024 }
+  limits: { fileSize: 500 * 1024 * 1024 }
 });
 
 app.get('/backend/pins', async (req, res) => {
