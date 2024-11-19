@@ -10,8 +10,8 @@ const PanoramicViewer = ({ imageUrl }) => {
       const viewer = new Marzipano.Viewer(panoElement);
       const source = Marzipano.ImageUrlSource.fromString(imageUrl);
       const geometry = new Marzipano.EquirectGeometry([{ width: 4000 }]);
-      const limiter = Marzipano.RectilinearView.limit.traditional(1024, 100 * Math.PI / 180);
-      const view = new Marzipano.RectilinearView({ yaw: Math.PI }, limiter);
+      const limiter = Marzipano.RectilinearView.limit.pitch(-0.300, 0.300);
+      const view = new Marzipano.RectilinearView({ yaw: Math.PI, pitch: 0 }, limiter);
       const scene = viewer.createScene({
         source: source,
         geometry: geometry,
